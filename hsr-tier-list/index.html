@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>星穹铁道角色喜好排行榜</title>
+<style>
+:root{--bg:#070b1f;--card:rgba(18,25,55,.82);--line:rgba(127,149,255,.28);--text:#edf2ff;--muted:#aeb8d6;--glow:rgba(111,137,255,.35);}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(circle at 10% 0,#26346f 0,#090d22 38%,#050715 100%);color:var(--text);min-height:100vh;padding:14px;padding-bottom:calc(18px + env(safe-area-inset-bottom));}
+.app{max-width:1180px;margin:0 auto}.hero,.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 40px rgba(0,0,0,.28), inset 0 0 28px rgba(110,130,255,.06);padding:18px;margin-bottom:14px;backdrop-filter:blur(12px)}
+h1{font-size:22px;margin:0 0 7px}p{margin:0;color:var(--muted);line-height:1.55}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.btn{border:1px solid var(--line);background:rgba(20,28,60,.95);color:var(--text);border-radius:16px;padding:12px 15px;font-size:15px;cursor:pointer}.btn.danger{border-color:rgba(255,102,140,.45)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px}.filters{display:grid;gap:10px}.filter-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}input,select{width:100%;border:1px solid var(--line);background:rgba(13,19,43,.9);color:var(--text);border-radius:16px;padding:13px 14px;font-size:16px;outline:none}select option{background:#111832}
+.tiers{display:flex;flex-direction:column;gap:10px}.tier{display:grid;grid-template-columns:54px minmax(0,1fr);gap:10px;align-items:stretch}.tier-label{border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.4px;border:1px solid var(--line);min-height:68px}.tier[data-tier="P0"] .tier-label{background:linear-gradient(135deg,#805dff,#ffcf6b);color:#120b21}.tier[data-tier="P1"] .tier-label{background:#6d5bff}.tier[data-tier="P2"] .tier-label{background:#3579ff}.tier[data-tier="P3"] .tier-label{background:#1a9bab}.tier[data-tier="P4"] .tier-label{background:#57657e}.tier[data-tier="P5"] .tier-label{background:#363b50}
+.dropzone,.pool{min-height:68px;border:1px dashed rgba(150,165,255,.35);border-radius:16px;padding:7px;display:flex;gap:8px;flex-wrap:wrap;align-content:flex-start;background:rgba(8,12,30,.35)}.pool{max-height:calc(100vh - 300px);overflow:auto;min-height:180px}
+.card{width:58px;height:68px;border:1px solid rgba(160,176,255,.28);border-radius:13px;background:linear-gradient(145deg,rgba(37,47,90,.95),rgba(9,13,32,.95));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;overflow:hidden;cursor:pointer;position:relative;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.card.dragging{opacity:.45}.card.touch-source{opacity:.25}.drag-ghost{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;transform:translate(-50%,-50%) scale(1.08);box-shadow:0 12px 30px rgba(0,0,0,.45),0 0 0 2px rgba(255,220,120,.22);}.no-scroll{overflow:hidden;touch-action:none}.dropzone.drag-over{border-color:rgba(255,220,120,.75);box-shadow:0 0 0 2px rgba(255,220,120,.12) inset}.avatar{width:48px;height:48px;border-radius:10px;object-fit:cover;background:#141a35}.name{font-size:10px;color:#dbe3ff;line-height:1;max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta{position:absolute;right:3px;top:3px;font-size:9px;background:rgba(0,0,0,.55);padding:1px 4px;border-radius:8px;color:#fff}.hint{font-size:13px;color:var(--muted);margin:8px 0 0}.empty{color:rgba(210,220,255,.45);font-size:13px;padding:17px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.52);display:none;align-items:flex-end;z-index:50;padding:14px}.modal.show{display:flex}.sheet{width:100%;max-width:520px;margin:0 auto;background:#111832;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 16px 50px #000}.sheet-title{font-weight:700;margin:4px 4px 12px}.sheet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.sheet-grid button{font-size:16px;padding:14px 8px;border-radius:15px;border:1px solid var(--line);background:#1a2449;color:#fff}.small{font-size:12px;color:var(--muted)}
+.mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:0 0 12px}.mode-tab{border:1px solid var(--line);background:rgba(13,19,43,.9);color:var(--text);border-radius:15px;padding:12px 8px;font-size:14px;font-weight:700;cursor:pointer}.mode-tab.active{background:linear-gradient(135deg,rgba(111,137,255,.95),rgba(184,103,255,.9));box-shadow:0 0 0 2px rgba(190,200,255,.12) inset,0 10px 26px rgba(90,80,220,.18)}.mode-note{display:none!important}
+@media (max-width:760px){body{padding:10px}.hero,.panel{border-radius:20px;padding:15px}.layout{display:flex;flex-direction:column}.ranking{order:1}.side{order:2}.pool{max-height:none;min-height:250px}.filter-row{grid-template-columns:1fr}.tier{grid-template-columns:46px 1fr}.tier-label{min-height:64px}.card{width:56px;height:66px}.avatar{width:46px;height:46px}.toolbar .btn{flex:1}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="hero">
+    <h1>星穹铁道角色喜好排行榜</h1>
+    <p>手机上长按头像即可拖拽到 P0-P5，也可以点头像打开菜单；电脑上可以拖拽到同一梯队里的具体位置。</p>
+    <div class="toolbar"><button class="btn danger" id="resetBtn">清空排行榜</button></div>
+  </section>
+  <main class="layout">
+    <section class="panel ranking">
+      <h2 style="margin:0 0 10px;font-size:18px">排行榜</h2>
+      <div class="mode-tabs" id="modeTabs"></div>
+      <p class="mode-note" id="modeNote"></p>
+      <div class="tiers" id="tiers"></div>
+      <p class="hint">提示：手机端长按头像后拖动，可以跨梯队移动，也可以在同一梯队里换位置；点头像也能用菜单调整。</p>
+    </section>
+    <aside class="panel side">
+      <h2 style="margin:0 0 10px;font-size:18px">搜索与筛选</h2>
+      <div class="filters">
+        <input id="search" placeholder="搜索中文/英文名，例如：黄泉 / Acheron" />
+        <div class="filter-row">
+          <select id="pathFilter"></select>
+          <select id="elementFilter"></select>
+        </div>
+      </div>
+      <h2 style="margin:18px 0 10px;font-size:18px">角色头像池</h2>
+      <div class="pool" id="pool"></div>
+      <p class="small" id="count"></p>
+    </aside>
+  </main>
+</div>
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="sheet-title" id="sheetTitle">选择位置</div>
+    <div class="sheet-grid">
+      <button data-move="P0">放入 P0</button><button data-move="P1">放入 P1</button><button data-move="P2">放入 P2</button>
+      <button data-move="P3">放入 P3</button><button data-move="P4">放入 P4</button><button data-move="P5">放入 P5</button>
+      <button data-action="left">左移一格</button><button data-action="right">右移一格</button><button data-action="front">移到最前</button>
+      <button data-action="back">移到最后</button><button data-move="pool">移回角色池</button><button data-close="1">取消</button>
+    </div>
+  </div>
+</div>
+<script>
+const characters = [{"id": "acheron", "nameCn": "黄泉", "nameEn": "Acheron", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Lightning", "elementCn": "雷", "version": "2.1", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Acheron_Icon.png"}, {"id": "aglaea", "nameCn": "阿格莱雅", "nameEn": "Aglaea", "rarity": 5, "path": "Remembrance", "pathCn": "记忆", "element": "Lightning", "elementCn": "雷", "version": "3.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Aglaea_Icon.png"}, {"id": "anaxa", "nameCn": "那刻夏", "nameEn": "Anaxa", "rarity": 5, "path": "Erudition", "pathCn": "智识", "element": "Wind", "elementCn": "风", "version": "3.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Anaxa_Icon.png"}, {"id": "archer", "nameCn": "Archer", "nameEn": "Archer", "rarity": 5, "path": "The Hunt", "pathCn": "巡猎", "element": "Quantum", "elementCn": "量子", "version": "3.4", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Archer_Icon.png"}, {"id": "argenti", "nameCn": "银枝", "nameEn": "Argenti", "rarity": 5, "path": "Erudition", "pathCn": "智识", "element": "Physical", "elementCn": "物理", "version": "1.5", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Argenti_Icon.png"}, {"id": "arlan", "nameCn": "阿兰", "nameEn": "Arlan", "rarity": 4, "path": "Destruction", "pathCn": "毁灭", "element": "Lightning", "elementCn": "雷", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Arlan_Icon.png"}, {"id": "ashveil", "nameCn": "不死途", "nameEn": "Ashveil", "rarity": 5, "path": "The Hunt", "pathCn": "巡猎", "element": "Lightning", "elementCn": "雷", "version": "4.1", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Ashveil_Icon.png"}, {"id": "asta", "nameCn": "艾丝妲", "nameEn": "Asta", "rarity": 4, "path": "Harmony", "pathCn": "同谐", "element": "Fire", "elementCn": "火", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Asta_Icon.png"}, {"id": "aventurine", "nameCn": "砂金", "nameEn": "Aventurine", "rarity": 5, "path": "Preservation", "pathCn": "存护", "element": "Imaginary", "elementCn": "虚数", "version": "2.1", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Aventurine_Icon.png"}, {"id": "bailu", "nameCn": "白露", "nameEn": "Bailu", "rarity": 5, "path": "Abundance", "pathCn": "丰饶", "element": "Lightning", "elementCn": "雷", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Bailu_Icon.png"}, {"id": "black_swan", "nameCn": "黑天鹅", "nameEn": "Black Swan", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Wind", "elementCn": "风", "version": "2.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Black_Swan_Icon.png"}, {"id": "blade", "nameCn": "刃", "nameEn": "Blade", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Wind", "elementCn": "风", "version": "1.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Blade_Icon.png"}, {"id": "boothill", "nameCn": "波提欧", "nameEn": "Boothill", "rarity": 5, "path": "The Hunt", "pathCn": "巡猎", "element": "Physical", "elementCn": "物理", "version": "2.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Boothill_Icon.png"}, {"id": "bronya", "nameCn": "布洛妮娅", "nameEn": "Bronya", "rarity": 5, "path": "Harmony", "pathCn": "同谐", "element": "Wind", "elementCn": "风", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Bronya_Icon.png"}, {"id": "castorice", "nameCn": "遐蝶", "nameEn": "Castorice", "rarity": 5, "path": "Remembrance", "pathCn": "记忆", "element": "Quantum", "elementCn": "量子", "version": "3.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Castorice_Icon.png"}, {"id": "cerydra", "nameCn": "刻律德菈", "nameEn": "Cerydra", "rarity": 5, "path": "Harmony", "pathCn": "同谐", "element": "Wind", "elementCn": "风", "version": "3.5", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Cerydra_Icon.png"}, {"id": "cipher", "nameCn": "赛飞儿", "nameEn": "Cipher", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Quantum", "elementCn": "量子", "version": "3.3", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Cipher_Icon.png"}, {"id": "clara", "nameCn": "克拉拉", "nameEn": "Clara", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Physical", "elementCn": "物理", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Clara_Icon.png"}, {"id": "cyrene", "nameCn": "昔涟", "nameEn": "Cyrene", "rarity": 5, "path": "Remembrance", "pathCn": "记忆", "element": "Ice", "elementCn": "冰", "version": "3.7", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Cyrene_Icon.png"}, {"id": "dan_heng", "nameCn": "丹恒", "nameEn": "Dan Heng", "rarity": 4, "path": "The Hunt", "pathCn": "巡猎", "element": "Wind", "elementCn": "风", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Dan_Heng_Icon.png"}, {"id": "imbibitor_lunae", "nameCn": "丹恒·饮月", "nameEn": "Dan Heng • Imbibitor Lunae", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Imaginary", "elementCn": "虚数", "version": "1.3", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Dan_Heng_•_Imbibitor_Lunae_Icon.png"}, {"id": "permansor_terrae", "nameCn": "丹恒·腾荒", "nameEn": "Dan Heng • Permansor Terrae", "rarity": 5, "path": "Preservation", "pathCn": "存护", "element": "Physical", "elementCn": "物理", "version": "3.6", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Dan_Heng_•_Permansor_Terrae_Icon.png"}, {"id": "dr_ratio", "nameCn": "真理医生", "nameEn": "Dr. Ratio", "rarity": 5, "path": "The Hunt", "pathCn": "巡猎", "element": "Imaginary", "elementCn": "虚数", "version": "1.6", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Dr._Ratio_Icon.png"}, {"id": "evanescia", "nameCn": "绯英", "nameEn": "Evanescia", "rarity": 5, "path": "Elation", "pathCn": "欢愉", "element": "Physical", "elementCn": "物理", "version": "4.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Evanescia_Icon.png"}, {"id": "evernight", "nameCn": "长夜月", "nameEn": "Evernight", "rarity": 5, "path": "Remembrance", "pathCn": "记忆", "element": "Ice", "elementCn": "冰", "version": "3.6", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Evernight_Icon.png"}, {"id": "feixiao", "nameCn": "飞霄", "nameEn": "Feixiao", "rarity": 5, "path": "The Hunt", "pathCn": "巡猎", "element": "Wind", "elementCn": "风", "version": "2.5", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Feixiao_Icon.png"}, {"id": "firefly", "nameCn": "流萤", "nameEn": "Firefly", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Fire", "elementCn": "火", "version": "2.3", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Firefly_Icon.png"}, {"id": "fu_xuan", "nameCn": "符玄", "nameEn": "Fu Xuan", "rarity": 5, "path": "Preservation", "pathCn": "存护", "element": "Quantum", "elementCn": "量子", "version": "1.3", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Fu_Xuan_Icon.png"}, {"id": "fugue", "nameCn": "忘归人", "nameEn": "Fugue", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Fire", "elementCn": "火", "version": "2.7", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Fugue_Icon.png"}, {"id": "gallagher", "nameCn": "加拉赫", "nameEn": "Gallagher", "rarity": 4, "path": "Abundance", "pathCn": "丰饶", "element": "Fire", "elementCn": "火", "version": "2.1", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Gallagher_Icon.png"}, {"id": "gepard", "nameCn": "杰帕德", "nameEn": "Gepard", "rarity": 5, "path": "Preservation", "pathCn": "存护", "element": "Ice", "elementCn": "冰", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Gepard_Icon.png"}, {"id": "guinaifen", "nameCn": "桂乃芬", "nameEn": "Guinaifen", "rarity": 4, "path": "Nihility", "pathCn": "虚无", "element": "Fire", "elementCn": "火", "version": "1.4", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Guinaifen_Icon.png"}, {"id": "hanya", "nameCn": "寒鸦", "nameEn": "Hanya", "rarity": 4, "path": "Harmony", "pathCn": "同谐", "element": "Physical", "elementCn": "物理", "version": "1.5", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Hanya_Icon.png"}, {"id": "herta", "nameCn": "黑塔", "nameEn": "Herta", "rarity": 4, "path": "Erudition", "pathCn": "智识", "element": "Ice", "elementCn": "冰", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Herta_Icon.png"}, {"id": "himeko", "nameCn": "姬子", "nameEn": "Himeko", "rarity": 5, "path": "Erudition", "pathCn": "智识", "element": "Fire", "elementCn": "火", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Himeko_Icon.png"}, {"id": "hook", "nameCn": "虎克", "nameEn": "Hook", "rarity": 4, "path": "Destruction", "pathCn": "毁灭", "element": "Fire", "elementCn": "火", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Hook_Icon.png"}, {"id": "huohuo", "nameCn": "藿藿", "nameEn": "Huohuo", "rarity": 5, "path": "Abundance", "pathCn": "丰饶", "element": "Wind", "elementCn": "风", "version": "1.5", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Huohuo_Icon.png"}, {"id": "hyacine", "nameCn": "风堇", "nameEn": "Hyacine", "rarity": 5, "path": "Remembrance", "pathCn": "记忆", "element": "Wind", "elementCn": "风", "version": "3.3", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Hyacine_Icon.png"}, {"id": "hysilens", "nameCn": "海瑟音", "nameEn": "Hysilens", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Physical", "elementCn": "物理", "version": "3.5", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Hysilens_Icon.png"}, {"id": "jade", "nameCn": "翡翠", "nameEn": "Jade", "rarity": 5, "path": "Erudition", "pathCn": "智识", "element": "Quantum", "elementCn": "量子", "version": "2.3", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Jade_Icon.png"}, {"id": "jiaoqiu", "nameCn": "椒丘", "nameEn": "Jiaoqiu", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Fire", "elementCn": "火", "version": "2.4", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Jiaoqiu_Icon.png"}, {"id": "jing_yuan", "nameCn": "景元", "nameEn": "Jing Yuan", "rarity": 5, "path": "Erudition", "pathCn": "智识", "element": "Lightning", "elementCn": "雷", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Jing_Yuan_Icon.png"}, {"id": "jingliu", "nameCn": "镜流", "nameEn": "Jingliu", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Ice", "elementCn": "冰", "version": "1.4", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Jingliu_Icon.png"}, {"id": "kafka", "nameCn": "卡芙卡", "nameEn": "Kafka", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Lightning", "elementCn": "雷", "version": "1.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Kafka_Icon.png"}, {"id": "lingsha", "nameCn": "灵砂", "nameEn": "Lingsha", "rarity": 5, "path": "Abundance", "pathCn": "丰饶", "element": "Fire", "elementCn": "火", "version": "2.5", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Lingsha_Icon.png"}, {"id": "luka", "nameCn": "卢卡", "nameEn": "Luka", "rarity": 4, "path": "Nihility", "pathCn": "虚无", "element": "Physical", "elementCn": "物理", "version": "1.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Luka_Icon.png"}, {"id": "luocha", "nameCn": "罗刹", "nameEn": "Luocha", "rarity": 5, "path": "Abundance", "pathCn": "丰饶", "element": "Imaginary", "elementCn": "虚数", "version": "1.1", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Luocha_Icon.png"}, {"id": "lynx", "nameCn": "玲可", "nameEn": "Lynx", "rarity": 4, "path": "Abundance", "pathCn": "丰饶", "element": "Quantum", "elementCn": "量子", "version": "1.3", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Lynx_Icon.png"}, {"id": "march_7th", "nameCn": "三月七", "nameEn": "March 7th", "rarity": 4, "path": "Preservation", "pathCn": "存护", "element": "Ice", "elementCn": "冰", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_March_7th_Icon.png"}, {"id": "march_7th_hunt", "nameCn": "三月七·巡猎", "nameEn": "March 7th (The Hunt)", "rarity": 4, "path": "The Hunt", "pathCn": "巡猎", "element": "Imaginary", "elementCn": "虚数", "version": "2.4", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_March_7th_(The_Hunt)_Icon.png"}, {"id": "misha", "nameCn": "米沙", "nameEn": "Misha", "rarity": 4, "path": "Destruction", "pathCn": "毁灭", "element": "Ice", "elementCn": "冰", "version": "2.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Misha_Icon.png"}, {"id": "moze", "nameCn": "貊泽", "nameEn": "Moze", "rarity": 4, "path": "The Hunt", "pathCn": "巡猎", "element": "Lightning", "elementCn": "雷", "version": "2.5", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Moze_Icon.png"}, {"id": "mydei", "nameCn": "万敌", "nameEn": "Mydei", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Imaginary", "elementCn": "虚数", "version": "3.1", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Mydei_Icon.png"}, {"id": "natasha", "nameCn": "娜塔莎", "nameEn": "Natasha", "rarity": 4, "path": "Abundance", "pathCn": "丰饶", "element": "Physical", "elementCn": "物理", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Natasha_Icon.png"}, {"id": "pela", "nameCn": "佩拉", "nameEn": "Pela", "rarity": 4, "path": "Nihility", "pathCn": "虚无", "element": "Ice", "elementCn": "冰", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Pela_Icon.png"}, {"id": "phainon", "nameCn": "白厄", "nameEn": "Phainon", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Physical", "elementCn": "物理", "version": "3.4", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Phainon_Icon.png"}, {"id": "qingque", "nameCn": "青雀", "nameEn": "Qingque", "rarity": 4, "path": "Erudition", "pathCn": "智识", "element": "Quantum", "elementCn": "量子", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Qingque_Icon.png"}, {"id": "rappa", "nameCn": "乱破", "nameEn": "Rappa", "rarity": 5, "path": "Erudition", "pathCn": "智识", "element": "Imaginary", "elementCn": "虚数", "version": "2.6", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Rappa_Icon.png"}, {"id": "robin", "nameCn": "知更鸟", "nameEn": "Robin", "rarity": 5, "path": "Harmony", "pathCn": "同谐", "element": "Physical", "elementCn": "物理", "version": "2.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Robin_Icon.png"}, {"id": "ruan_mei", "nameCn": "阮·梅", "nameEn": "Ruan Mei", "rarity": 5, "path": "Harmony", "pathCn": "同谐", "element": "Ice", "elementCn": "冰", "version": "1.6", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Ruan_Mei_Icon.png"}, {"id": "saber", "nameCn": "Saber", "nameEn": "Saber", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Wind", "elementCn": "风", "version": "3.4", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Saber_Icon.png"}, {"id": "sampo", "nameCn": "桑博", "nameEn": "Sampo", "rarity": 4, "path": "Nihility", "pathCn": "虚无", "element": "Wind", "elementCn": "风", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Sampo_Icon.png"}, {"id": "seele", "nameCn": "希儿", "nameEn": "Seele", "rarity": 5, "path": "The Hunt", "pathCn": "巡猎", "element": "Quantum", "elementCn": "量子", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Seele_Icon.png"}, {"id": "serval", "nameCn": "希露瓦", "nameEn": "Serval", "rarity": 4, "path": "Erudition", "pathCn": "智识", "element": "Lightning", "elementCn": "雷", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Serval_Icon.png"}, {"id": "silver_wolf", "nameCn": "银狼", "nameEn": "Silver Wolf", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Quantum", "elementCn": "量子", "version": "1.1", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Silver_Wolf_Icon.png"}, {"id": "silver_wolf_lv999", "nameCn": "银狼 LV.999", "nameEn": "Silver Wolf LV.999", "rarity": 5, "path": "Elation", "pathCn": "欢愉", "element": "Imaginary", "elementCn": "虚数", "version": "4.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Silver_Wolf_LV.999_Icon.png"}, {"id": "sparkle", "nameCn": "花火", "nameEn": "Sparkle", "rarity": 5, "path": "Harmony", "pathCn": "同谐", "element": "Quantum", "elementCn": "量子", "version": "2.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Sparkle_Icon.png"}, {"id": "sparxie", "nameCn": "Sparxie", "nameEn": "Sparxie", "rarity": 5, "path": "Elation", "pathCn": "欢愉", "element": "Fire", "elementCn": "火", "version": "4.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Sparxie_Icon.png"}, {"id": "sunday", "nameCn": "星期日", "nameEn": "Sunday", "rarity": 5, "path": "Harmony", "pathCn": "同谐", "element": "Imaginary", "elementCn": "虚数", "version": "2.7", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Sunday_Icon.png"}, {"id": "sushang", "nameCn": "素裳", "nameEn": "Sushang", "rarity": 4, "path": "The Hunt", "pathCn": "巡猎", "element": "Physical", "elementCn": "物理", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Sushang_Icon.png"}, {"id": "the_dahlia", "nameCn": "大丽花", "nameEn": "The Dahlia", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Fire", "elementCn": "火", "version": "3.8", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_The_Dahlia_Icon.png"}, {"id": "the_herta", "nameCn": "大黑塔", "nameEn": "The Herta", "rarity": 5, "path": "Erudition", "pathCn": "智识", "element": "Ice", "elementCn": "冰", "version": "3.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_The_Herta_Icon.png"}, {"id": "tingyun", "nameCn": "停云", "nameEn": "Tingyun", "rarity": 4, "path": "Harmony", "pathCn": "同谐", "element": "Lightning", "elementCn": "雷", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Tingyun_Icon.png"}, {"id": "topaz_numby", "nameCn": "托帕&账账", "nameEn": "Topaz & Numby", "rarity": 5, "path": "The Hunt", "pathCn": "巡猎", "element": "Fire", "elementCn": "火", "version": "1.4", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Topaz_&_Numby_Icon.png"}, {"id": "trailblazer_destruction", "nameCn": "开拓者·毁灭", "nameEn": "Trailblazer (Destruction)", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Physical", "elementCn": "物理", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Trailblazer_(Destruction)_Icon.png"}, {"id": "trailblazer_preservation", "nameCn": "开拓者·存护", "nameEn": "Trailblazer (Preservation)", "rarity": 5, "path": "Preservation", "pathCn": "存护", "element": "Fire", "elementCn": "火", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Trailblazer_(Preservation)_Icon.png"}, {"id": "trailblazer_harmony", "nameCn": "开拓者·同谐", "nameEn": "Trailblazer (Harmony)", "rarity": 5, "path": "Harmony", "pathCn": "同谐", "element": "Imaginary", "elementCn": "虚数", "version": "2.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Trailblazer_(Harmony)_Icon.png"}, {"id": "trailblazer_remembrance", "nameCn": "开拓者·记忆", "nameEn": "Trailblazer (Remembrance)", "rarity": 5, "path": "Remembrance", "pathCn": "记忆", "element": "Ice", "elementCn": "冰", "version": "3.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Trailblazer_(Remembrance)_Icon.png"}, {"id": "trailblazer_elation", "nameCn": "开拓者·欢愉", "nameEn": "Trailblazer (Elation)", "rarity": 5, "path": "Elation", "pathCn": "欢愉", "element": "Lightning", "elementCn": "雷", "version": "4.2", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Trailblazer_(Elation)_Icon.png"}, {"id": "tribbie", "nameCn": "缇宝", "nameEn": "Tribbie", "rarity": 5, "path": "Harmony", "pathCn": "同谐", "element": "Quantum", "elementCn": "量子", "version": "3.1", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Tribbie_Icon.png"}, {"id": "welt", "nameCn": "瓦尔特", "nameEn": "Welt", "rarity": 5, "path": "Nihility", "pathCn": "虚无", "element": "Imaginary", "elementCn": "虚数", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Welt_Icon.png"}, {"id": "xueyi", "nameCn": "雪衣", "nameEn": "Xueyi", "rarity": 4, "path": "Destruction", "pathCn": "毁灭", "element": "Quantum", "elementCn": "量子", "version": "1.6", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Xueyi_Icon.png"}, {"id": "yanqing", "nameCn": "彦卿", "nameEn": "Yanqing", "rarity": 5, "path": "The Hunt", "pathCn": "巡猎", "element": "Ice", "elementCn": "冰", "version": "1.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Yanqing_Icon.png"}, {"id": "yao_guang", "nameCn": "爻光", "nameEn": "Yao Guang", "rarity": 5, "path": "Elation", "pathCn": "欢愉", "element": "Physical", "elementCn": "物理", "version": "4.0", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Yao_Guang_Icon.png"}, {"id": "yukong", "nameCn": "驭空", "nameEn": "Yukong", "rarity": 4, "path": "Harmony", "pathCn": "同谐", "element": "Imaginary", "elementCn": "虚数", "version": "1.1", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Yukong_Icon.png"}, {"id": "yunli", "nameCn": "云璃", "nameEn": "Yunli", "rarity": 5, "path": "Destruction", "pathCn": "毁灭", "element": "Physical", "elementCn": "物理", "version": "2.4", "avatar": "https://honkai-star-rail.fandom.com/wiki/Special:Redirect/file/Character_Yunli_Icon.png"}];
+
+// 性别榜单分类：用于“男角色排名 / 女角色排名”的角色池过滤。
+// 说明：开拓者是玩家可选性别，这里设置为 both，会同时出现在男榜和女榜里。
+// 如果后续你想调整某个角色，只需要改这里的 male / female / both。
+const GENDER_MAP = {
+  acheron:"female", aglaea:"female", anaxa:"male", archer:"male", argenti:"male", arlan:"male", ashveil:"female", asta:"female", aventurine:"male", bailu:"female",
+  black_swan:"female", blade:"male", boothill:"male", bronya:"female", castorice:"female", cerydra:"female", cipher:"female", clara:"female", cyrene:"female",
+  dan_heng:"male", imbibitor_lunae:"male", permansor_terrae:"male", dr_ratio:"male", evanescia:"female", evernight:"female", feixiao:"female", firefly:"female", fu_xuan:"female", fugue:"female",
+  gallagher:"male", gepard:"male", guinaifen:"female", hanya:"female", herta:"female", himeko:"female", hook:"female", huohuo:"female", hyacine:"female", hysilens:"female", jade:"female", jiaoqiu:"male",
+  jing_yuan:"male", jingliu:"female", kafka:"female", lingsha:"female", luka:"male", luocha:"male", lynx:"female", march_7th:"female", march_7th_hunt:"female", misha:"male", moze:"male", mydei:"male",
+  natasha:"female", pela:"female", phainon:"male", qingque:"female", rappa:"female", robin:"female", ruan_mei:"female", saber:"female", sampo:"male", seele:"female", serval:"female",
+  silver_wolf:"female", silver_wolf_lv999:"female", sparkle:"female", sparxie:"female", sunday:"male", sushang:"female", the_dahlia:"female", the_herta:"female", tingyun:"female", topaz_numby:"female",
+  tribbie:"female", welt:"male", xueyi:"female", yanqing:"male", yao_guang:"female", yukong:"female", yunli:"female"
+};
+const TRAILBLAZER_IDS = ["trailblazer_destruction","trailblazer_preservation","trailblazer_harmony","trailblazer_remembrance","trailblazer_elation"];
+const BOARD_MODES = {
+  all: {label:"全部角色", note:""},
+  male: {label:"男角色", note:""},
+  female: {label:"女角色", note:""}
+};
+const ACTIVE_MODE_KEY = "hsr-tier-active-mode-v4";
+const TIERS = ["P0","P1","P2","P3","P4","P5"];
+const STORAGE_KEY = "hsr-tier-mobile-v10-gender-boards-tb-new-filenames";
+let activeMode = localStorage.getItem(ACTIVE_MODE_KEY) || "all";
+function emptyTiers(){ return {P0:[],P1:[],P2:[],P3:[],P4:[],P5:[]}; }
+function normalizeState(raw){
+  const base={boards:{all:{tiers:emptyTiers()}, male:{tiers:emptyTiers()}, female:{tiers:emptyTiers()}}};
+  if(raw && raw.boards){
+    ["all","male","female"].forEach(mode=>{
+      if(raw.boards[mode] && raw.boards[mode].tiers){ base.boards[mode].tiers={...emptyTiers(), ...raw.boards[mode].tiers}; }
+    });
+    return base;
+  }
+  if(raw && raw.tiers){ base.boards.all.tiers={...emptyTiers(), ...raw.tiers}; }
+  return base;
+}
+let state = normalizeState(JSON.parse(
+  localStorage.getItem(STORAGE_KEY)
+  || localStorage.getItem("hsr-tier-mobile-v7-gender-boards")
+  || localStorage.getItem("hsr-tier-mobile-v5-gender-boards")
+  || localStorage.getItem("hsr-tier-mobile-v4-gender-boards")
+  || localStorage.getItem("hsr-tier-mobile-v3")
+  || "{}"
+));
+if(!BOARD_MODES[activeMode]) activeMode="all";
+let selectedId = null;
+let suppressClickUntil = 0;
+let touchDrag = null;
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); localStorage.setItem(ACTIVE_MODE_KEY, activeMode); }
+function currentTiers(){ return state.boards[activeMode].tiers; }
+function allRanked(){ return new Set(Object.values(currentTiers()).flat()); }
+function isTrailblazerBaseId(id){ return TRAILBLAZER_IDS.includes(id); }
+function isVirtualTrailblazerId(id){ return /^trailblazer_.*_(male|female)$/.test(id); }
+function virtualTrailblazerGender(id){ const m=id.match(/_(male|female)$/); return m ? m[1] : null; }
+function baseTrailblazerId(id){ return isVirtualTrailblazerId(id) ? id.replace(/_(male|female)$/,'') : id; }
+function makeGenderedTrailblazer(baseChar, gender){
+  const cnSuffix = gender === "male" ? "（男）" : "（女）";
+  const enSuffix = gender === "male" ? " (Male)" : " (Female)";
+  return {...baseChar, id:`${baseChar.id}_${gender}`, baseId:baseChar.id, nameCn:`${baseChar.nameCn}${cnSuffix}`, nameEn:`${baseChar.nameEn}${enSuffix}`, genderVariant:gender};
+}
+function displayCharactersForMode(){
+  if(activeMode === "all") return characters;
+  const normal = characters.filter(c=>{
+    if(isTrailblazerBaseId(c.id)) return false;
+    const g=GENDER_MAP[c.id] || "unknown";
+    return g===activeMode;
+  });
+  const trailblazers = characters
+    .filter(c=>isTrailblazerBaseId(c.id))
+    .map(c=>makeGenderedTrailblazer(c, activeMode));
+  return [...normal, ...trailblazers];
+}
+function charById(id){
+  if(isVirtualTrailblazerId(id)){
+    const baseId = baseTrailblazerId(id);
+    const base = characters.find(c=>c.id===baseId);
+    const gender = virtualTrailblazerGender(id);
+    return base && gender ? makeGenderedTrailblazer(base, gender) : null;
+  }
+  return characters.find(c=>c.id===id) || null;
+}
+function genderOf(id){
+  if(isVirtualTrailblazerId(id)) return virtualTrailblazerGender(id);
+  if(isTrailblazerBaseId(id)) return "both";
+  return GENDER_MAP[id] || "unknown";
+}
+function allowedInMode(id){
+  if(activeMode === "all") return !isVirtualTrailblazerId(id);
+  if(isVirtualTrailblazerId(id)) return virtualTrailblazerGender(id) === activeMode;
+  if(isTrailblazerBaseId(id)) return false;
+  return genderOf(id)===activeMode;
+}
+function migrateTrailblazerIdsInBoards(){
+  // 全部榜使用普通开拓者 id；男榜/女榜使用独立虚拟 id，彻底避免头像和排序串榜。
+  ["all","male","female"].forEach(mode=>{
+    const tiers = state.boards[mode].tiers;
+    TIERS.forEach(t=>{
+      const seen = new Set();
+      tiers[t] = (tiers[t] || [])
+        .map(id=>{
+          const base = baseTrailblazerId(id);
+          if(isTrailblazerBaseId(base)){
+            if(mode === "all") return base;
+            return `${base}_${mode}`;
+          }
+          return id;
+        })
+        .filter(id=>allowedIdForMode(id, mode))
+        .filter(id=>{
+          if(seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        });
+    });
+  });
+}
+function allowedIdForMode(id, mode){
+  if(mode === "all") return !isVirtualTrailblazerId(id);
+  if(isVirtualTrailblazerId(id)) return virtualTrailblazerGender(id) === mode;
+  if(isTrailblazerBaseId(id)) return false;
+  return (GENDER_MAP[id] || "unknown") === mode;
+}
+migrateTrailblazerIdsInBoards();
+save();
+function wikiNameFor(c){
+  const map={
+    "dan_heng_imbibitor_lunae":"丹恒•饮月",
+    "dan_heng_permansor_terrae":"丹恒•腾荒",
+    "march_7th_the_hunt":"三月七•巡猎",
+    "trailblazer_destruction":"开拓者•毁灭",
+    "trailblazer_preservation":"开拓者•存护",
+    "trailblazer_harmony":"开拓者•同谐",
+    "trailblazer_remembrance":"开拓者•记忆",
+    "trailblazer_elation":"开拓者•欢愉",
+    "topaz_numby":"托帕&账账",
+    "the_herta":"大黑塔"
+  };
+  return map[c.id] || c.nameCn || c.nameEn;
+}
+function avatarCandidates(c){
+  // 普通角色：assets/角色id.png
+  // 性别榜里的开拓者使用全新的文件名，彻底避开旧图片缓存和通用图回退。
+  // 男榜：assets/tb_male_trailblazer_xxx.png
+  // 女榜：assets/tb_female_trailblazer_xxx.png
+  const fileId = c.baseId || c.id;
+  if(c.genderVariant === "male"){
+    return [`./assets/tb_male_${fileId}.png?v=tb10`];
+  }
+  if(c.genderVariant === "female"){
+    return [`./assets/tb_female_${fileId}.png?v=tb10`];
+  }
+  return [`./assets/${fileId}.png?v=tb10`];
+}
+
+function preloadCurrentModeAvatars(){
+  // 提前加载当前模式下的开拓者头像，减少切换时的闪动。
+  if(activeMode === "all") return;
+  TRAILBLAZER_IDS.forEach(baseId=>{
+    const img = new Image();
+    img.src = `./assets/tb_${activeMode}_${baseId}.png?v=tb10`;
+  });
+}
+
+function imgFallback(img,c){
+  // 只允许当前角色的唯一头像文件失败后显示文字，不再尝试通用开拓者图。
+  img.onerror = null;
+  img.style.display="none";
+  const parent=img.parentElement;
+  if(!parent.querySelector(".fallback")){
+    const d=document.createElement("div");
+    d.className="fallback";
+    d.style.cssText="font-size:18px;font-weight:800;color:#fff";
+    d.textContent=(c.nameCn||c.nameEn).replace(/（男）|（女）/g,"").slice(0,2);
+    parent.insertBefore(d, parent.querySelector(".name"));
+  }
+}
+function makeCard(c){
+  const el=document.createElement("div"); el.className="card"; el.draggable=true; el.dataset.id=c.id; el.title=`${c.nameCn} / ${c.nameEn}\n${c.pathCn} / ${c.elementCn}`;
+  const sources=avatarCandidates(c);
+  el.innerHTML=`<span class="meta">${c.rarity}★</span><img class="avatar" src="${sources[0]}" data-try-index="0" referrerpolicy="no-referrer" alt=""><span class="name">${c.nameCn}</span>`;
+  el.querySelector("img").onerror=()=>imgFallback(el.querySelector("img"), c);
+  el.addEventListener("click",()=>{ if(Date.now() < suppressClickUntil) return; openSheet(c.id); });
+  el.addEventListener("pointerdown", e=>handlePointerDown(e, el, c.id));
+  el.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",c.id); el.classList.add("dragging");});
+  el.addEventListener("dragend",()=>el.classList.remove("dragging"));
+  return el;
+}
+
+function handlePointerDown(e, el, id){
+  if(e.pointerType !== "touch" && e.pointerType !== "pen") return;
+  if(!e.isPrimary) return;
+  const startX=e.clientX, startY=e.clientY;
+  const timer=setTimeout(()=>startTouchDrag(el,id,startX,startY,e.pointerId),220);
+  touchDrag={id, el, pointerId:e.pointerId, startX, startY, lastX:startX, lastY:startY, timer, started:false};
+  document.addEventListener("pointermove", handlePointerMove, {passive:false});
+  document.addEventListener("pointerup", handlePointerUp, {passive:false});
+  document.addEventListener("pointercancel", handlePointerCancel, {passive:false});
+}
+function startTouchDrag(el,id,x,y,pointerId){
+  if(!touchDrag || touchDrag.id!==id || touchDrag.pointerId!==pointerId) return;
+  touchDrag.started=true;
+  document.body.classList.add("no-scroll");
+  el.classList.add("touch-source");
+  const ghost=el.cloneNode(true);
+  ghost.classList.add("drag-ghost");
+  ghost.style.width=el.offsetWidth+"px";
+  ghost.style.height=el.offsetHeight+"px";
+  document.body.appendChild(ghost);
+  touchDrag.ghost=ghost;
+  moveGhost(x,y);
+  updateTouchTarget(x,y);
+  if(navigator.vibrate) navigator.vibrate(12);
+}
+function moveGhost(x,y){
+  if(!touchDrag || !touchDrag.ghost) return;
+  touchDrag.ghost.style.left=x+"px";
+  touchDrag.ghost.style.top=y+"px";
+}
+function clearTouchTarget(){
+  document.querySelectorAll(".dropzone.drag-over,.pool.drag-over").forEach(el=>el.classList.remove("drag-over"));
+}
+function elementBelowGhost(x,y){
+  const ghost=touchDrag && touchDrag.ghost;
+  if(ghost) ghost.style.display="none";
+  const el=document.elementFromPoint(x,y);
+  if(ghost) ghost.style.display="";
+  return el;
+}
+function updateTouchTarget(x,y){
+  clearTouchTarget();
+  const el=elementBelowGhost(x,y);
+  const zone=el && (el.closest(".dropzone") || el.closest(".pool"));
+  if(zone) zone.classList.add("drag-over");
+}
+function handlePointerMove(e){
+  if(!touchDrag || e.pointerId!==touchDrag.pointerId) return;
+  const dx=e.clientX-touchDrag.startX, dy=e.clientY-touchDrag.startY;
+  touchDrag.lastX=e.clientX; touchDrag.lastY=e.clientY;
+  if(!touchDrag.started){
+    if(Math.hypot(dx,dy)>12){ cancelTouchDrag(false); }
+    return;
+  }
+  e.preventDefault();
+  moveGhost(e.clientX,e.clientY);
+  updateTouchTarget(e.clientX,e.clientY);
+}
+function handlePointerUp(e){
+  if(!touchDrag || e.pointerId!==touchDrag.pointerId) return;
+  if(!touchDrag.started){ cancelTouchDrag(false); return; }
+  e.preventDefault();
+  const id=touchDrag.id;
+  const x=e.clientX, y=e.clientY;
+  const el=elementBelowGhost(x,y);
+  const zone=el && (el.closest(".dropzone") || el.closest(".pool"));
+  cleanupTouchDrag(true);
+  if(zone){
+    if(zone.classList.contains("pool")) moveTo(id,"pool");
+    else moveTo(id, zone.dataset.tier, getInsertIndex(zone,x,y));
+  }else{
+    render();
+  }
+}
+function handlePointerCancel(e){
+  if(!touchDrag || e.pointerId!==touchDrag.pointerId) return;
+  cancelTouchDrag(true);
+}
+function cancelTouchDrag(wasDrag){ cleanupTouchDrag(wasDrag); }
+function cleanupTouchDrag(wasDrag){
+  if(!touchDrag) return;
+  clearTimeout(touchDrag.timer);
+  clearTouchTarget();
+  if(touchDrag.el) touchDrag.el.classList.remove("touch-source");
+  if(touchDrag.ghost) touchDrag.ghost.remove();
+  document.body.classList.remove("no-scroll");
+  document.removeEventListener("pointermove", handlePointerMove);
+  document.removeEventListener("pointerup", handlePointerUp);
+  document.removeEventListener("pointercancel", handlePointerCancel);
+  touchDrag=null;
+  if(wasDrag) suppressClickUntil=Date.now()+450;
+}
+
+function getInsertIndex(zone, clientX, clientY){
+  const cards=[...zone.querySelectorAll(".card:not(.dragging)")];
+  if(cards.length===0) return 0;
+  for(let i=0;i<cards.length;i++){
+    const r=cards[i].getBoundingClientRect();
+    const midX=r.left+r.width/2;
+    const midY=r.top+r.height/2;
+    // 同一行内，拖到头像左半边就插到它前面；拖到右半边继续往后找
+    if(clientY < r.bottom && clientY > r.top-8){
+      if(clientX < midX) return i;
+      if(i===cards.length-1 || clientX < r.right) return i+1;
+    }
+    // 拖到某一行上方，插到这一行开头
+    if(clientY < midY) return i;
+  }
+  return cards.length;
+}
+function renderModeTabs(){
+  const box=document.getElementById("modeTabs");
+  if(!box) return;
+  box.innerHTML=Object.entries(BOARD_MODES).map(([key,item])=>`<button class="mode-tab ${key===activeMode?'active':''}" data-mode="${key}">${item.label}排名</button>`).join("");
+  document.getElementById("modeNote").textContent=BOARD_MODES[activeMode].note;
+  box.querySelectorAll(".mode-tab").forEach(btn=>{
+    btn.onclick=()=>{ if(touchDrag) cleanupTouchDrag(true); closeSheet(); activeMode=btn.dataset.mode; save(); render(); };
+  });
+}
+function renderTiers(){
+  renderModeTabs();
+  const tiers=currentTiers();
+  const root=document.getElementById("tiers"); root.innerHTML="";
+  TIERS.forEach(t=>{
+    const row=document.createElement("div"); row.className="tier"; row.dataset.tier=t;
+    const lab=document.createElement("div"); lab.className="tier-label"; lab.textContent=t;
+    const zone=document.createElement("div"); zone.className="dropzone"; zone.dataset.tier=t;
+    zone.addEventListener("dragover",e=>{e.preventDefault(); zone.classList.add("drag-over");});
+    zone.addEventListener("dragleave",()=>zone.classList.remove("drag-over"));
+    zone.addEventListener("drop",e=>{
+      e.preventDefault(); zone.classList.remove("drag-over");
+      const id=e.dataTransfer.getData("text/plain");
+      const index=getInsertIndex(zone,e.clientX,e.clientY);
+      moveTo(id, t, index);
+    });
+    (tiers[t]||[]).forEach(id=>{ const c=charById(id); if(c) zone.appendChild(makeCard(c)); });
+    if((tiers[t]||[]).length===0){ const emp=document.createElement("div"); emp.className="empty"; emp.textContent="点下方头像放到这里"; zone.appendChild(emp); }
+    row.append(lab,zone); root.appendChild(row);
+  });
+}
+function renderFilters(){
+  const pf=document.getElementById("pathFilter"), ef=document.getElementById("elementFilter");
+  const paths=[["all","全部命途"],["Destruction","毁灭"],["The Hunt","巡猎"],["Erudition","智识"],["Harmony","同谐"],["Nihility","虚无"],["Preservation","存护"],["Abundance","丰饶"],["Remembrance","记忆"],["Elation","欢愉"]];
+  const els=[["all","全部属性"],["Physical","物理"],["Fire","火"],["Ice","冰"],["Lightning","雷"],["Wind","风"],["Quantum","量子"],["Imaginary","虚数"]];
+  pf.innerHTML=paths.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join("");
+  ef.innerHTML=els.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join("");
+}
+function renderPool(){
+  const pool=document.getElementById("pool"); pool.innerHTML="";
+  const ranked=allRanked();
+  const q=document.getElementById("search").value.trim().toLowerCase();
+  const p=document.getElementById("pathFilter").value, e=document.getElementById("elementFilter").value;
+  const availableCharacters = displayCharactersForMode();
+  const list=availableCharacters
+    .filter(c=>!ranked.has(c.id))
+    .filter(c=>p==="all"||c.path===p)
+    .filter(c=>e==="all"||c.element===e)
+    .filter(c=>!q||c.nameCn.toLowerCase().includes(q)||c.nameEn.toLowerCase().includes(q));
+  list.forEach(c=>pool.appendChild(makeCard(c)));
+  if(list.length===0){ const emp=document.createElement("div"); emp.className="empty"; emp.textContent="没有符合条件的角色，试试清空搜索或筛选。"; pool.appendChild(emp); }
+  const modeTotal=availableCharacters.length;
+  document.getElementById("count").textContent=`${BOARD_MODES[activeMode].label}池显示 ${list.length} 个；当前模式共 ${modeTotal} 个。`;
+  pool.addEventListener("dragover",e=>e.preventDefault(), {once:true});
+  pool.ondrop=e=>{e.preventDefault(); moveTo(e.dataTransfer.getData("text/plain"), "pool");};
+}
+function render(){ renderTiers(); renderPool(); }
+function removeFromTiers(id){ const tiers=currentTiers(); TIERS.forEach(t=> tiers[t]=tiers[t].filter(x=>x!==id));}
+function locateInTier(id){
+  const tiers=currentTiers();
+  for(const t of TIERS){ const idx=tiers[t].indexOf(id); if(idx!==-1) return {tier:t,index:idx}; }
+  return null;
+}
+function moveTo(id,target,index){
+  if(!id) return;
+  if(target!=="pool" && !allowedInMode(id)){ alert("这个角色不属于当前榜单模式，可以切换到全部角色榜再操作。"); return; }
+  removeFromTiers(id);
+  if(target!=="pool"){
+    const arr=currentTiers()[target];
+    const safeIndex=Number.isInteger(index) ? Math.max(0, Math.min(index, arr.length)) : arr.length;
+    arr.splice(safeIndex,0,id);
+  }
+  save(); render(); closeSheet();
+}
+function reorderSelected(action){
+  if(!selectedId) return;
+  const loc=locateInTier(selectedId);
+  if(!loc){ alert("这个角色还在角色池里。先放入一个梯队，再调整顺序。"); return; }
+  const arr=currentTiers()[loc.tier];
+  const [item]=arr.splice(loc.index,1);
+  let next=loc.index;
+  if(action==="left") next=Math.max(0,loc.index-1);
+  if(action==="right") next=Math.min(arr.length,loc.index+1);
+  if(action==="front") next=0;
+  if(action==="back") next=arr.length;
+  arr.splice(next,0,item);
+  save(); render(); closeSheet();
+}
+function openSheet(id){ selectedId=id; const c=charById(id); document.getElementById("sheetTitle").textContent=`${c.nameCn} 放到哪里？`; document.getElementById("modal").classList.add("show");}
+function closeSheet(){ document.getElementById("modal").classList.remove("show"); selectedId=null;}
+document.getElementById("modal").addEventListener("click",e=>{ if(e.target.id==="modal"||e.target.dataset.close) closeSheet(); if(e.target.dataset.move) moveTo(selectedId,e.target.dataset.move); if(e.target.dataset.action) reorderSelected(e.target.dataset.action);});
+document.getElementById("resetBtn").onclick=()=>{ if(confirm(`确定清空当前【${BOARD_MODES[activeMode].label}排名】吗？其他榜单不会被清空。`)){ state.boards[activeMode].tiers=emptyTiers(); save(); render(); }};
+["search","pathFilter","elementFilter"].forEach(id=>document.getElementById(id).addEventListener("input",renderPool));
+renderFilters(); render();
+</script>
+</body>
+</html>
